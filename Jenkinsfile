@@ -24,7 +24,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir('node-js-dummy-test/jenkins') {
-                    sh 'docker build -t node-builder -f node-build.Dockerfile .. | tee ../build.log'
+                    sh 'docker build -t node-builder -f node-build.Dockerfile jenkins | tee ../build.log'
                 }
                 archiveArtifacts artifacts: "node-js-dummy-test/build.log"
             }
@@ -33,9 +33,8 @@ pipeline {
         stage('Tests') {
             steps {
                 dir('node-js-dummy-test/jenkins') {
-                    sh 'docker build -t node-test -f node-test.Dockerfile .. | tee ../test.log'
+                    sh 'docker build -t node-test -f node-test.Dockerfile jenkins | tee ../test.log'
                 }
-                archiveArtifacts artifacts: "node-js-dummy-test/test.log"
             }
         }
 
@@ -43,7 +42,7 @@ pipeline {
             steps {
                 sh 'docker network create my_network || true'
                 dir('node-js-dummy-test/jenkins') {
-                    sh 'docker build -t node-deploy -f node-deploy.Dockerfile ..'
+                    sh 'docker build -t node-deploy -f node-deploy.Dockerfile jenkins'
                     sh 'docker rm -f app || true'
                     sh 'docker run -d -p 3000:3000 --name app --network my_network node-deploy'
                 }
